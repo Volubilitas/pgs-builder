@@ -1,4 +1,4 @@
-# feather-pgs · ASS → HDMV PGS
+# pgs-builder · ASS → HDMV PGS
 
 **把 ASS 字幕直接编成蓝光规格的 PGS（`.sup`）位图字幕轨**，做到 4K60 全片可用
 （实测 16107 帧 / 3840×1638 / 13.2 帧每秒）。
