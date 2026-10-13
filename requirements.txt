@@ -1,0 +1,5 @@
+# 运行时只需要 numpy（位流写入 / RLE / 调色板 / 验收全是 numpy 做的）
+numpy>=1.24
+# 只有 tools/效果图.py（重新生成 README 那两张效果图）需要 Pillow
+Pillow>=9.0
+# ffmpeg 不是 pip 依赖：需要带 libass 的构建，用 PATH 或环境变量 FFMPEG 指过去

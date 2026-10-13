@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+_smoke/
+*.sup
+*.npy
+*.bgra
+# 内部交接单（含成片路径等私有信息，不入库）
+待续.md
