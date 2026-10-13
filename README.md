@@ -38,7 +38,7 @@ Unknown encoder 'hdmv_pgs_subtitle'      # 或 Encoder (codec hdmv_pgs_subtitle)
 | ③ **逐帧量化 + RLE** | 预乘空间最近邻；对象按内容 bbox 裁剪 | RLE 每行必须写满对象宽度，否则解码器报 `Insufficient RLE data` |
 | ④ **写 display set** | `PCS/WDS/PDS/ODS/END`，90 kHz PTS | `comp_state` 用 `0x80`（首个）/`0x00`（其余）；用 `0x40` 会拖影 |
 
-原理与取舍的完整推导见 **[docs/原理.md](docs/原理.md)**；所有踩过的坑见 **[docs/坑.md](docs/坑.md)**。
+原理与取舍的完整推导见 **[docs/design.md](docs/design.md)**；所有踩过的坑见 **[docs/pitfalls.md](docs/pitfalls.md)**。
 
 ## 快速开始
 
@@ -56,7 +56,7 @@ python gen_pgs.py encode  --ass examples/demo.ass --size 3840x1638 --crop 0,262,
                           --pal pal.npy --out out.sup
 
 # ③ 自己验收（不需要任何源片，PASS 时退出码 0，可直接当 CI）
-python 验收PGS.py --sup out.sup --ass examples/demo.ass --size 3840x1638 --crop 0,262,3840,1638 \
+python verify_pgs.py --sup out.sup --ass examples/demo.ass --size 3840x1638 --crop 0,262,3840,1638 \
                   --frames 300 --ffmpeg-check
 
 # ④ 封装进 mkv（⚠️ 必须关掉容器内压缩，见"交付"一节）
@@ -121,7 +121,7 @@ mkvmerge -o out.mkv --compression 0:none video.mkv out.sup
 
 ## 自己验收：三条判据（不需要源片）
 
-`验收PGS.py` 用**同一条字幕的两趟黑白渲染**当参考，与 `.sup` 解码结果比。
+`verify_pgs.py` 用**同一条字幕的两趟黑白渲染**当参考，与 `.sup` 解码结果比。
 下面这段输出**照抄可复现**：先 `mkdir -p _smoke`，用这两条命令建板并编码
 （`--step` 不能省，默认是 1.0 秒，与这里不同），再按后面的命令验收：
 
@@ -131,7 +131,7 @@ python gen_pgs.py encode  --ass examples/demo.ass --size 1920x1080 --crop 0,200,
 ```
 
 ```
-$ python 验收PGS.py --sup _smoke/demo.sup --ass examples/demo.ass \
+$ python verify_pgs.py --sup _smoke/demo.sup --ass examples/demo.ass \
       --size 1920x1080 --crop 0,200,1400,800 --frames 130 --ffmpeg-check
 
 位流：121 个 display set（PCS），PTS 0.000 ~ 2.000 s；解出对象的 121 组
@@ -155,18 +155,18 @@ PASS ✔（15s）
 
 另加 `--ffmpeg-check`：让 ffprobe 用自己的 PGS 解析器数一遍帧 —— **位流标准合规的外部旁证**。
 
-上面两张效果图由 `tools/效果图.py` 生成（需要 Pillow；注意要用**不带 `--crop`** 编出的 `.sup`，
+上面两张效果图由 `tools/effect_sheet.py` 生成（需要 Pillow；注意要用**不带 `--crop`** 编出的 `.sup`，
 否则窗口外的阶梯档没有内容）：
 
 ```bash
-python tools/效果图.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
+python tools/effect_sheet.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
 ```
 
 ⚠️ 图头印的是**单帧（第 45 帧）**的读数（RMSE 0.961 / Σα 1.0002 / α 档位 90），
 **与上表的"整段 120 帧均值"不是一个口径**，别把两者混着引用。
 
 ```bash
-python tools/效果图.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
+python tools/effect_sheet.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
 ```
 
 （`_smoke/` 是本地临时目录，`.sup` / `.npy` 等中间件都落在那里，已在 `.gitignore` 里。）
@@ -199,11 +199,11 @@ mkvmerge -o out.mkv --compression 0:none video.mkv out.sup    # 作用域 = 紧�
 ```
 pgsenc.py      PGS 位流写入器（纯 Python/numpy，无外部依赖）：调色板 / RLE / display set / ODS 分片
 gen_pgs.py     CLI：palette（建板） + encode（渲染→量化→写流）
-sup解码.py     最小 PGS 解码器（验收用；含擦除集语义）
-验收PGS.py     往返自检：预乘 RMSE / Σα 保真比 / α 档位数（PASS→退出码 0）
-tools/         效果图.py —— 重新生成 docs/ 里那两张对照图
+sup_decode.py     最小 PGS 解码器（验收用；含擦除集语义）
+verify_pgs.py     往返自检：预乘 RMSE / Σα 保真比 / α 档位数（PASS→退出码 0）
+tools/         effect_sheet.py —— 重新生成 docs/ 里那两张对照图
 examples/      自造示例字幕（矢量图形 + 移动文字 + 12 档 α 阶梯），无任何第三方素材
-docs/          原理.md（为什么这么做）、坑.md（踩过的坑）、两张效果图
+docs/          design.md（为什么这么做）、pitfalls.md（踩过的坑）、两张效果图
 ```
 
 ## 环境

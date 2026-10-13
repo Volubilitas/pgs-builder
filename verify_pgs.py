@@ -11,10 +11,10 @@
 用法：
     python gen_pgs.py palette --ass examples/demo.ass --size 1920x1080 --crop 0,200,1400,800 --step 0.25 --pal _smoke/pal.npy
     python gen_pgs.py encode  --ass examples/demo.ass --size 1920x1080 --crop 0,200,1400,800 --pal _smoke/pal.npy --out _smoke/demo.sup --frames 120
-    python 验收PGS.py --sup _smoke/demo.sup --ass examples/demo.ass --size 1920x1080 --crop 0,200,1400,800 --frames 120
+    python verify_pgs.py --sup _smoke/demo.sup --ass examples/demo.ass --size 1920x1080 --crop 0,200,1400,800 --frames 120
 
     # 加一条"位流标准合规"的旁证：让 ffmpeg 自己的 PGS 解码器把 .sup 吃一遍
-    python 验收PGS.py --sup _smoke/demo.sup --ass examples/demo.ass --crop 0,200,1400,800 --ffmpeg-check
+    python verify_pgs.py --sup _smoke/demo.sup --ass examples/demo.ass --crop 0,200,1400,800 --ffmpeg-check
 
 三条判据（阈值就在下面的 PASS/FAIL 里，可直接当 CI 用）：
     ① 预乘空间 RMSE(0-255)     均值 < 8
@@ -36,7 +36,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import sup解码 as DEC          # noqa: E402
+import sup_decode as DEC          # noqa: E402
 import gen_pgs as G            # noqa: E402
 
 

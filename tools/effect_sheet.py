@@ -4,7 +4,7 @@
 用法（先编一条全画布的 .sup，别用带 --crop 的，否则窗口外的阶梯档没有内容）：
     python gen_pgs.py palette --ass examples/demo.ass --size 1920x1080 --step 0.25 --pal _smoke/pal_full.npy --frames 120
     python gen_pgs.py encode  --ass examples/demo.ass --size 1920x1080 --pal _smoke/pal_full.npy --out _smoke/demo_full.sup --frames 120
-    python tools/效果图.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
+    python tools/effect_sheet.py --sup _smoke/demo_full.sup --ass examples/demo.ass --frame 45 --outdir docs
 
 输出：<outdir>/roundtrip.png、<outdir>/alpha-ladder.png
 """
@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 import gen_pgs as G          # noqa: E402
-import sup解码 as DEC         # noqa: E402
+import sup_decode as DEC         # noqa: E402
 
 BG = (46, 48, 54)            # 对照图底片色（中暗灰，淡部能看出来）
 LADDER_BG = (96, 98, 104)    # 阶梯底色用更亮的灰：α≈7 在纯黑上几乎看不见
