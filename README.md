@@ -98,7 +98,8 @@ mkvmerge -o out.mkv --compression 0:none video.mkv out.sup
 
 ## 自己验收：三条判据（不需要源片）
 
-`验收PGS.py` 用**同一条字幕的两趟黑白渲染**当参考，与 `.sup` 解码结果比：
+`验收PGS.py` 用**同一条字幕的两趟黑白渲染**当参考，与 `.sup` 解码结果比
+（示例里的 `.sup` 就是快速开始那条命令的产物，先 `mkdir -p _smoke` 再编）：
 
 ```
 $ python 验收PGS.py --sup _smoke/demo.sup --ass examples/demo.ass \
